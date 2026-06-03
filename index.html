@@ -117,7 +117,7 @@
 <div class="wrap">
   <div class="diagram">
     <h2>Diagramma decisionale</h2>
-    <div class="cl">Vista d'insieme del procedimento. La sezione sotto traduce questi rami in checklist operativa.</div>
+    <div class="cl">Vista d'insieme del procedimento, aggiornato al procedimento autorizzatorio unico (art. 8, L. 49/2026). La sezione sotto traduce questi rami in checklist operativa.</div>
     <div class="dleg">
       <span><i style="background:#faeeda"></i>Decisione (sì/no)</span>
       <span><i style="background:#9fe1cb"></i>Studio / valutazione</span>
@@ -151,13 +151,13 @@
       <path d="M130 484 V568 H240" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="118" y="512">sì</text>
       <line x1="340" y1="484" x2="340" y2="538" class="dar" marker-end="url(#ar)"/>
 
-      <rect x="240" y="538" width="200" height="56" rx="10" fill="#cecbf6" stroke="#7f77dd"/><text class="dtt" x="340" y="560" text-anchor="middle" fill="#26215c">AIA (Regione)</text><text class="dts" x="340" y="578" text-anchor="middle" fill="#3c3489">≥50 MWt · art. 29-ter</text>
-      <line x1="340" y1="594" x2="340" y2="628" class="dar" marker-end="url(#ar)"/>
+      <rect x="240" y="538" width="200" height="56" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="340" y="560" text-anchor="middle" fill="#3d3d3a">Istanza autorizz. unica</text><text class="dts" x="340" y="578" text-anchor="middle" fill="#5f5e5a">proponente → autorità AIA</text>
+      <line x1="340" y1="594" x2="340" y2="626" class="dar" marker-end="url(#ar)"/>
 
-      <rect x="240" y="628" width="200" height="44" rx="10" fill="#cecbf6" stroke="#7f77dd"/><text class="dtt" x="340" y="654" text-anchor="middle" fill="#26215c">Titolo edilizio · Comune</text>
-      <line x1="340" y1="672" x2="340" y2="702" class="dar" marker-end="url(#ar)"/>
+      <rect x="240" y="626" width="200" height="56" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="340" y="648" text-anchor="middle" fill="#3d3d3a">Conferenza di Servizi</text><text class="dts" x="340" y="666" text-anchor="middle" fill="#5f5e5a">termine ord. 10 mesi</text>
+      <line x1="340" y1="682" x2="340" y2="714" class="dar" marker-end="url(#ar)"/>
 
-      <rect x="240" y="702" width="200" height="56" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="340" y="724" text-anchor="middle" fill="#3d3d3a">Conferenza di Servizi</text><text class="dts" x="340" y="742" text-anchor="middle" fill="#5f5e5a">Provincia / Città Metro</text>
+      <rect x="240" y="714" width="200" height="56" rx="10" fill="#cecbf6" stroke="#7f77dd"/><text class="dtt" x="340" y="736" text-anchor="middle" fill="#26215c">Autorizzazione unica</text><text class="dts" x="340" y="754" text-anchor="middle" fill="#3c3489">art. 8 · L. 49/2026</text>
     </svg>
   </div>
 
@@ -210,7 +210,7 @@
   <div id="stages"></div>
 
   <footer>
-    <b>Fonti:</b> Linee guida MASE per le procedure di valutazione ambientale dei Data Center (ago 2024); DGR Lombardia 2629/2024; D.Lgs. 152/2006 (TUA); DPR 120/2017; DPR 357/97; D.Lgs. 155/2010; Reg. (UE) 1060/2021; Dir. 92/43/CEE e 2009/147/CE; L.R. Lombardia 12/2005, 5/2010.<br><br>
+    <b>Fonti:</b> Linee guida MASE per le procedure di valutazione ambientale dei Data Center (ago 2024); DGR Lombardia 2629/2024; Legge 10 aprile 2026 n. 49 (conversione DL 21/2026 «DL Energia/Bollette»), art. 8 — procedimento autorizzatorio unico; D.Lgs. 152/2006 (TUA); DPR 120/2017; DPR 357/97; D.Lgs. 155/2010; Reg. (UE) 1060/2021; Dir. 92/43/CEE e 2009/147/CE; L.R. Lombardia 12/2005, 5/2010.<br><br>
     Strumento di supporto alla progettazione. Non sostituisce il testo normativo vigente: gli adempimenti puntuali vanno verificati alla fonte. Le note in giallo segnalano i punti da verificare caso per caso.
   </footer>
 </div>
@@ -321,15 +321,16 @@ const STEPS=[
   d:"Se il decreto impone prescrizioni da sviluppare prima della progettazione esecutiva, l'AIA deve essere preceduta dalla verifica di ottemperanza.",
   l:[["Art. 28 TUA","Verifica di ottemperanza delle condizioni ambientali."]],w:c=>ge50(c)&&c.prescrizioni},
 
- {id:"aia",s:"D",role:"proc",t:"Autorizzazione Integrata Ambientale (AIA)",
-  d:"Obbligatoria per impianto termico > 50 MWt. Acquisita dopo esclusione da VIA o VIA favorevole; integra il Piano di Monitoraggio e Controllo (PMC).",
-  l:[["Art. 29-ter TUA","Domanda di AIA."],["Art. 26 c.1 TUA","Priorità della VIA sul rilascio dell'AIA."]],w:ge50},
- {id:"titolo",s:"D",role:"proc",t:"Titolo edilizio (Comune)",
-  d:"Rilasciato dopo le valutazioni ambientali. Titoli rilasciati prima espongono ad annullamento e maggiori costi di adeguamento.",
-  l:[["Art. 26 c.1 TUA","VIA integrata in ogni titolo abilitativo."]],w:()=>true},
- {id:"conf",s:"D",role:"proc",t:"Conferenza di Servizi",
-  d:"Per strutture di medie/grandi dimensioni, con parere di compatibilità di Provincia o Città Metropolitana.",
-  l:[["DGR Lombardia 2629/2024","Parere in Conferenza di Servizi."]],w:ge50},
+ {id:"istanza",s:"D",role:"proc",t:"Istanza di autorizzazione unica",
+  d:"Il proponente avvia il procedimento unico con un'unica istanza all'autorità competente in materia di AIA (MASE o Regione). Riguarda realizzazione, ampliamento ed esercizio del data center e delle reti di connessione di utenza, di qualsiasi tensione.",
+  l:[["L. 49/2026 art. 8 (conv. DL 21/2026)","Procedimento autorizzatorio unico per i data center."]],
+  n:"L'individuazione dell'autorità è legata alla competenza AIA, che scatta oltre le soglie di potenza; sotto soglia il riferimento resta meno definito.",w:ge50},
+ {id:"autuni",s:"D",role:"proc",t:"Autorizzazione unica (Conferenza di Servizi)",
+  d:"Rilasciata dall'autorità competente per l'AIA all'esito della Conferenza di Servizi, entro un termine ordinario di 10 mesi. Ricomprende in un unico titolo: AIA, autorizzazioni edilizio-urbanistiche, di connessione alla rete, paesaggistiche, beni culturali, salute e pubblica incolumità. La VIA, ove prevista, resta presupposto e vi è integrata.",
+  l:[["L. 49/2026 art. 8 (conv. DL 21/2026)","Autorizzazione unica; Conferenza di Servizi; termine 10 mesi."],["Art. 29-ter TUA","AIA ricompresa nel titolo unico."],["Art. 26 c.1 TUA","Integrazione della VIA nel titolo."]],w:ge50},
+ {id:"titolo",s:"D",role:"proc",t:"Titoli edilizio-urbanistici",
+  d:"Per i data center soggetti ad AIA i titoli edilizi sono ricompresi nell'autorizzazione unica. Sotto le soglie di AIA restano gli ordinari titoli edilizio-urbanistici comunali.",
+  l:[["L. 49/2026 art. 8","Titoli edilizi assorbiti nell'autorizzazione unica."],["Art. 26 c.1 TUA","VIA integrata in ogni titolo abilitativo."]],w:()=>true},
  {id:"pereq",s:"D",role:"proc",t:"Perequazione territoriale intercomunale",
   d:"Per i grandi data center si auspica l'applicazione di forme di perequazione tra Comuni interessati.",
   l:[["L.R. 12/2005 art. 11 c.2-ter","Perequazione intercomunale."]],w:ge50},
@@ -366,7 +367,7 @@ function render(){
   else{
     html+='<span class="step">'+(cfg.power==='gt150'?'> 150 MWt':'50–150 MWt')+'</span><span class="sep">→</span>';
     html+=(cfg.power==='gt150')?'<span class="step">VIA (art. 23)</span>':'<span class="step">Verifica (art. 19)</span>';
-    html+='<span class="sep">→</span><span class="step">AIA</span><span class="sep">→</span><span class="step">Titolo</span>';
+    html+='<span class="sep">→</span><span class="step">Aut. unica (art. 8)</span>';
     if(cfg.natura2000)html+='<span class="cond">+ VIncA</span>';
     if(cfg.gasolio)html+='<span class="cond">+ Rel. riferimento</span>';
     if(cfg.contaminato)html+='<span class="cond">+ CSC</span>';
