@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-do procedurale — Autorizzazione Data Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f3ea;--paper2:#efeadd;--card:#ffffff;--ink:#23241f;--ink2:#5a5b51;
+    --line:#dad4c4;--green:#1f4d3a;--green2:#2f6b51;--gold:#b07d18;
+    --agr:#1d6e56;--ing:#185fa5;--geo:#a06012;--arc:#993c1d;--orn:#534ab7;--ari:#993556;--proc:#5f5e5a;
+    --r:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Public Sans",sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;
+    background-image:radial-gradient(circle at 1px 1px,rgba(31,77,58,.05) 1px,transparent 0);background-size:26px 26px}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+  header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--paper2),var(--paper));padding:40px 0 26px}
+  .kicker{font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--green2);font-weight:700;margin-bottom:12px}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(28px,4.6vw,44px);line-height:1.05;letter-spacing:-.01em}
+  .sub{margin-top:14px;max-width:60ch;color:var(--ink2);font-size:15.5px}
+
+  /* overview diagram */
+  .diagram{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 16px;margin:26px 0 0}
+  .diagram h2{font-family:"Fraunces",serif;font-weight:500;font-size:19px;margin-bottom:4px}
+  .diagram .cl{color:var(--ink2);font-size:13.5px;margin-bottom:14px}
+  .diagram svg{width:100%;height:auto;display:block}
+  .dleg{display:flex;flex-wrap:wrap;gap:10px 18px;margin-bottom:14px}
+  .dleg span{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2)}
+  .dleg i{width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.12)}
+  .dtt{font-family:"Public Sans",sans-serif;font-weight:600;font-size:13.5px}
+  .dts{font-family:"Public Sans",sans-serif;font-weight:400;font-size:11.5px}
+  .dar{stroke:#5a5b51;stroke-width:1.4;fill:none}
+  .dlbl{font-family:"Public Sans",sans-serif;font-size:11.5px;font-weight:600;fill:#5a5b51}
+
+  /* configurator */
+  .config{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 8px;margin:26px 0}
+  .config h2{font-family:"Fraunces",serif;font-weight:500;font-size:19px;margin-bottom:4px}
+  .config .cl{color:var(--ink2);font-size:13.5px;margin-bottom:16px}
+  .ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+  .ctrl .q{flex:1 1 220px;font-size:14px;font-weight:500}
+  .ctrl .q small{display:block;color:var(--ink2);font-weight:400;font-size:12px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--paper)}
+  .seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink2);padding:7px 15px;cursor:pointer;white-space:nowrap}
+  .seg button.on{background:var(--green);color:#fff;font-weight:600}
+  .seg button:not(.on):hover{background:var(--paper2)}
+
+  /* path summary */
+  .path{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 4px;font-size:13.5px}
+  .path .step{background:var(--green);color:#fff;padding:5px 12px;border-radius:999px;font-weight:600}
+  .path .sep{color:var(--ink2)}
+  .path .cond{background:#fff;border:1px dashed var(--gold);color:var(--gold);padding:4px 11px;border-radius:999px;font-weight:600;font-size:12.5px}
+
+  /* progress */
+  .prog{display:flex;align-items:center;gap:14px;margin:22px 0 8px}
+  .bar{flex:1;height:9px;background:var(--paper2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--green);transition:width .35s}
+  .pct{font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;min-width:128px;text-align:right;color:var(--green)}
+  .reset{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;color:var(--ink2)}
+  .reset:hover{border-color:var(--ink2);color:var(--ink)}
+
+  /* stages + timeline */
+  .stage{margin-top:30px}
+  .stage-h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+  .stage-h .sn{font-family:"Fraunces",serif;font-size:30px;color:var(--green);line-height:1}
+  .stage-h .st{font-weight:600;font-size:16px}
+  .stage-h .ct{margin-left:auto;font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .tl{position:relative;margin-left:13px;padding-left:27px;border-left:2px solid var(--line)}
+
+  .item{position:relative;margin:10px 0}
+  .item:before{content:"";position:absolute;left:-34px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--line)}
+  .item.done:before{background:var(--green);border-color:var(--green)}
+  .row{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    border-left:4px solid var(--c,var(--proc));padding:13px 15px;cursor:pointer;transition:box-shadow .12s,transform .1s}
+  .row:hover{box-shadow:0 5px 16px rgba(31,77,58,.09)}
+  .chk{flex:0 0 auto;width:22px;height:22px;border:2px solid var(--line);border-radius:6px;background:#fff;margin-top:1px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.12s}
+  .chk svg{width:13px;height:13px;opacity:0;transform:scale(.6);transition:.12s}
+  .item.done .chk{background:var(--green);border-color:var(--green)}
+  .item.done .chk svg{opacity:1;transform:scale(1)}
+  .item.done .ttl{text-decoration:line-through;color:var(--ink2)}
+  .main{flex:1;min-width:0}
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .ttl{font-weight:600;font-size:15px}
+  .role{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--c,var(--proc));
+    border:1px solid color-mix(in srgb,var(--c,var(--proc)) 35%,transparent);border-radius:999px;padding:2px 9px}
+  .why{font-size:11px;color:var(--gold);border:1px dashed var(--gold);border-radius:999px;padding:2px 9px;font-weight:600}
+  .det{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .item.open .det{max-height:600px}
+  .det-in{padding-top:10px}
+  .det-in p{font-size:13.8px;color:var(--ink);margin-bottom:10px}
+  .laws{display:flex;flex-direction:column;gap:6px}
+  .law{font-size:12.8px;background:var(--paper2);border-radius:7px;padding:7px 11px}
+  .law b{color:var(--green);font-weight:600}
+  .law span{color:var(--ink2);display:block;font-size:12px;margin-top:1px}
+  .note{margin-top:8px;font-size:12.5px;color:var(--ink2);border-left:3px solid var(--gold);padding:7px 11px;background:#fff;border-radius:0 6px 6px 0}
+  .caret{flex:0 0 auto;color:var(--ink2);transition:transform .25s;margin-top:3px}
+  .item.open .caret{transform:rotate(180deg)}
+
+  footer{padding:30px 0 60px;color:var(--ink2);font-size:12.8px;border-top:1px solid var(--line);margin-top:36px}
+  footer b{color:var(--ink)}
+  @media(max-width:560px){.ctrl .q{flex-basis:100%}.pct{min-width:96px}}
+  @media print{.config,.reset,.chk,.caret{display:none}.det{max-height:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="kicker">To-do procedurale · Lombardia</div>
+  <h1>Autorizzazione Data Center</h1>
+  <p class="sub">Configura il caso: i rami decisionali generano la checklist ordinata degli adempimenti. Spunta ogni step; clicca per descrizione e rimandi normativi.</p>
+</div></header>
+
+<div class="wrap">
+  <div class="diagram">
+    <h2>Diagramma decisionale</h2>
+    <div class="cl">Vista d'insieme del procedimento. La sezione sotto traduce questi rami in checklist operativa.</div>
+    <div class="dleg">
+      <span><i style="background:#faeeda"></i>Decisione (sì/no)</span>
+      <span><i style="background:#9fe1cb"></i>Studio / valutazione</span>
+      <span><i style="background:#cecbf6"></i>Autorizzazione</span>
+      <span><i style="background:#eceae1"></i>Esito / altro</span>
+    </div>
+    <svg viewBox="0 0 680 800" role="img" aria-label="Diagramma decisionale autorizzazione data center">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5a5b51" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+      <rect x="230" y="30" width="220" height="44" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="340" y="56" text-anchor="middle" fill="#3d3d3a">Progetto Data Center + GE</text>
+      <line x1="340" y1="74" x2="340" y2="102" class="dar" marker-end="url(#ar)"/>
+
+      <rect x="230" y="102" width="220" height="56" rx="10" fill="#faeeda" stroke="#ef9f27"/><text class="dtt" x="340" y="124" text-anchor="middle" fill="#633806">Pot. termica ≥ 50 MWt?</text><text class="dts" x="340" y="142" text-anchor="middle" fill="#854f0b">incl. riserva · ½ coeff.</text>
+      <line x1="450" y1="130" x2="480" y2="130" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="466" y="124" text-anchor="middle">no</text>
+      <rect x="480" y="102" width="160" height="56" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="560" y="124" text-anchor="middle" fill="#3d3d3a">Fuori AIA/VIA</text><text class="dts" x="560" y="142" text-anchor="middle" fill="#5f5e5a">VAS + titolo edil.</text>
+
+      <line x1="340" y1="158" x2="340" y2="218" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="350" y="190">sì</text>
+
+      <rect x="240" y="218" width="200" height="56" rx="10" fill="#faeeda" stroke="#ef9f27"/><text class="dtt" x="340" y="240" text-anchor="middle" fill="#633806">Potenza > 150 MWt?</text><text class="dts" x="340" y="258" text-anchor="middle" fill="#854f0b">IPPC → AIA</text>
+
+      <path d="M240 246 H130 V328" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="150" y="238" text-anchor="middle">50–150</text>
+      <line x1="340" y1="274" x2="340" y2="428" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="352" y="300">&gt;150</text>
+
+      <rect x="40" y="328" width="180" height="56" rx="10" fill="#9fe1cb" stroke="#1d9e75"/><text class="dtt" x="130" y="350" text-anchor="middle" fill="#0b4234">Verifica assoggett.</text><text class="dts" x="130" y="368" text-anchor="middle" fill="#0f6e56">art. 19 · SPA · MASE</text>
+      <line x1="130" y1="384" x2="130" y2="428" class="dar" marker-end="url(#ar)"/>
+
+      <rect x="40" y="428" width="180" height="56" rx="10" fill="#faeeda" stroke="#ef9f27"/><text class="dtt" x="130" y="450" text-anchor="middle" fill="#633806">Esclusione da VIA?</text><text class="dts" x="130" y="468" text-anchor="middle" fill="#854f0b">esito MASE</text>
+
+      <rect x="240" y="428" width="200" height="56" rx="10" fill="#9fe1cb" stroke="#1d9e75"/><text class="dtt" x="340" y="450" text-anchor="middle" fill="#0b4234">VIA piena</text><text class="dts" x="340" y="468" text-anchor="middle" fill="#0f6e56">art. 23 ss · SIA</text>
+      <line x1="220" y1="456" x2="240" y2="456" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="230" y="448" text-anchor="middle">no</text>
+      <path d="M130 484 V568 H240" class="dar" marker-end="url(#ar)"/><text class="dlbl" x="118" y="512">sì</text>
+      <line x1="340" y1="484" x2="340" y2="538" class="dar" marker-end="url(#ar)"/>
+
+      <rect x="240" y="538" width="200" height="56" rx="10" fill="#cecbf6" stroke="#7f77dd"/><text class="dtt" x="340" y="560" text-anchor="middle" fill="#26215c">AIA (Regione)</text><text class="dts" x="340" y="578" text-anchor="middle" fill="#3c3489">≥50 MWt · art. 29-ter</text>
+      <line x1="340" y1="594" x2="340" y2="628" class="dar" marker-end="url(#ar)"/>
+
+      <rect x="240" y="628" width="200" height="44" rx="10" fill="#cecbf6" stroke="#7f77dd"/><text class="dtt" x="340" y="654" text-anchor="middle" fill="#26215c">Titolo edilizio · Comune</text>
+      <line x1="340" y1="672" x2="340" y2="702" class="dar" marker-end="url(#ar)"/>
+
+      <rect x="240" y="702" width="200" height="56" rx="10" fill="#eceae1" stroke="#bdbcb4"/><text class="dtt" x="340" y="724" text-anchor="middle" fill="#3d3d3a">Conferenza di Servizi</text><text class="dts" x="340" y="742" text-anchor="middle" fill="#5f5e5a">Provincia / Città Metro</text>
+    </svg>
+  </div>
+
+  <div class="config">
+    <h2>Configura il caso</h2>
+    <div class="cl">Le risposte determinano quali step si applicano (diagramma decisionale).</div>
+
+    <div class="ctrl">
+      <div class="q">Potenza termica aggregata dei GE<small>incl. riserva · coeff. di dimezzamento</small></div>
+      <div class="seg" data-k="power">
+        <button data-v="lt50">&lt; 50 MWt</button>
+        <button data-v="50_150" class="on">50–150 MWt</button>
+        <button data-v="gt150">&gt; 150 MWt</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <div class="q">Interferenza con Rete Natura 2000<small>SIC / ZSC / ZPS o elementi RER</small></div>
+      <div class="seg" data-k="natura2000"><button data-v="1">sì</button><button data-v="0" class="on">no</button></div>
+    </div>
+    <div class="ctrl">
+      <div class="q">Stoccaggio rilevante di gasolio</div>
+      <div class="seg" data-k="gasolio"><button data-v="1">sì</button><button data-v="0" class="on">no</button></div>
+    </div>
+    <div class="ctrl">
+      <div class="q">Sito potenzialmente contaminato / SIN</div>
+      <div class="seg" data-k="contaminato"><button data-v="1">sì</button><button data-v="0" class="on">no</button></div>
+    </div>
+    <div class="ctrl">
+      <div class="q">Vincolo paesaggistico</div>
+      <div class="seg" data-k="paesaggio"><button data-v="1" class="on">sì</button><button data-v="0">no</button></div>
+    </div>
+    <div class="ctrl">
+      <div class="q">Potenziale interesse archeologico</div>
+      <div class="seg" data-k="archeo"><button data-v="1" class="on">sì</button><button data-v="0">no</button></div>
+    </div>
+    <div class="ctrl" style="border-bottom:1px solid var(--line)">
+      <div class="q">Prescrizioni ambientali ante-esecutivo<small>se imposte dal decreto VIA/verifica</small></div>
+      <div class="seg" data-k="prescrizioni"><button data-v="1">sì</button><button data-v="0" class="on">no</button></div>
+    </div>
+
+    <div class="path" id="path"></div>
+  </div>
+
+  <div class="prog">
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="pct" id="pct">0 / 0 step</div>
+    <button class="reset" id="reset">Azzera</button>
+  </div>
+
+  <div id="stages"></div>
+
+  <footer>
+    <b>Fonti:</b> Linee guida MASE per le procedure di valutazione ambientale dei Data Center (ago 2024); DGR Lombardia 2629/2024; D.Lgs. 152/2006 (TUA); DPR 120/2017; DPR 357/97; D.Lgs. 155/2010; Reg. (UE) 1060/2021; Dir. 92/43/CEE e 2009/147/CE; L.R. Lombardia 12/2005, 5/2010.<br><br>
+    Strumento di supporto alla progettazione. Non sostituisce il testo normativo vigente: gli adempimenti puntuali vanno verificati alla fonte. Le note in giallo segnalano i punti da verificare caso per caso.
+  </footer>
+</div>
+
+<script>
+const ROLE={agr:["Agronomo","var(--agr)"],ing:["Ingegnere","var(--ing)"],geo:["Geologo","var(--geo)"],
+  arc:["Archeologo","var(--arc)"],orn:["Ornitologo","var(--orn)"],ari:["Architetto","var(--ari)"],proc:["Procedurale","var(--proc)"]};
+const STAGES={A:"Avvio e inquadramento",B:"Studio ambientale (SPA / SIA)",C:"Procedura presso l'autorità",D:"Titoli, gestione e chiusura"};
+
+const ge50=c=>c.power!=='lt50';
+const STEPS=[
+ {id:"calc",s:"A",role:"ing",t:"Calcolo della potenza termica aggregata",
+  d:"Somma delle potenze termiche nominali di tutti gli impianti di combustione installati, incluse le unità di riserva, con applicazione del coefficiente di dimezzamento ai fini soglia.",
+  l:[["All. II e II-bis, Parte II, TUA","Soglie 50 e 150 MWt."],["MASE prot. 209407 del 20.12.2023","Dimezzamento nel calcolo della soglia."]],
+  n:"Il valore del coefficiente non è esplicitato nelle linee guida: verificare la risposta MASE.",w:()=>true},
+ {id:"regime",s:"A",role:"proc",t:"Determinazione del regime di valutazione",
+  d:"Sulla base della potenza aggregata si individua il binario: nessuna VIA/AIA statale (<50), verifica di assoggettabilità (50–150) o VIA obbligatoria (>150).",
+  l:[["Art. 19 / Artt. 23 ss. TUA","Verifica vs VIA."],["Art. 29-ter TUA","AIA obbligatoria ≥ 50 MWt (IPPC)."]],w:()=>true},
+ {id:"frazion",s:"A",role:"proc",t:"Verifica del divieto di frazionamento",
+  d:"Il progetto va valutato unitariamente nel dimensionamento totale, compresi sviluppi per fasi future. Vietato sottoporre a valutazione solo impatti parziali.",
+  l:[["Linee guida MASE 2024","Divieto di frazionamento artificioso."]],w:()=>true},
+ {id:"urb",s:"A",role:"agr",t:"Compatibilità urbanistica e VAS",
+  d:"Verifica di compatibilità con destinazione produttiva/direzionale e di eventuale assoggettabilità a VAS della scelta pianificatoria a monte.",
+  l:[["DGR Lombardia 2629/2024","Compatibilità urbanistica; VAS per medie/grandi strutture."]],w:()=>true},
+ {id:"alt",s:"A",role:"proc",t:"Analisi delle alternative localizzative",
+  d:"Confronto di alternative di sito secondo criteri territoriali (consumo di suolo, qualità aria, rischio, paesaggio) e tecnici (rinnovabili, brownfield, economie di sistema).",
+  l:[["DGR Lombardia 2629/2024","Priorità a siti inattivi / brownfield / aree da rigenerare."],["Atlante Nazionale Consumo di Suolo","Aree a maggiore criticità."]],w:()=>true},
+
+ {id:"sia",s:"B",role:"proc",t:(c)=>c.power==='gt150'?"Redazione dello Studio di Impatto Ambientale (SIA)":"Redazione dello Studio Preliminare Ambientale (SPA)",
+  d:"Documento centrale della procedura, esteso a tutte le componenti dell'art. 5 c.1 lett. c). Per > 150 MWt è il SIA (VIA); per 50–150 MWt lo SPA (verifica).",
+  l:[["Art. 5 c.1 lett. c) TUA","Fattori di impatto da valutare."],["LLGG SNPA 28/2020","Norme tecniche per gli studi di impatto."]],w:ge50},
+ {id:"sito",s:"B",role:"agr",t:"Inquadramento del sito e uso del suolo",
+  d:"Caratterizzazione di suolo, uso del suolo, impermeabilizzazione e servizi ecosistemici dell'area di intervento.",
+  l:[["Art. 5 c.1 lett. c) TUA","Territorio, suolo."]],w:ge50},
+ {id:"csc",s:"B",role:"geo",t:"Caratterizzazione contaminazione (CSC)",why:"Sito contaminato / SIN",
+  d:"Indagini sui valori di Concentrazione Soglia di Contaminazione e gestione delle acque sotterranee; verifica appartenenza a Siti di Interesse Nazionale.",
+  l:[["Parte IV Tit. V, All. 5 TUA","Valori di CSC."],["Art. 243 c.5 TUA","Acque sotterranee in siti in bonifica."],["Art. 252 TUA","SIN."]],w:c=>ge50(c)&&c.contaminato},
+ {id:"veg",s:"B",role:"agr",t:"Vegetazione e flora",
+  d:"Studio floristico-vegetazionale, habitat e specie, interferenze e misure di mitigazione/compensazione.",
+  l:[["Art. 5 c.1 lett. c) TUA","Biodiversità."],["Dir. 92/43/CEE, All. I","Habitat di interesse comunitario."]],w:ge50},
+ {id:"fauna",s:"B",role:"agr",t:"Fauna",
+  d:"Analisi delle componenti faunistiche e delle interferenze del progetto.",
+  l:[["Dir. 92/43/CEE, All. II/IV/V","Specie di interesse comunitario."]],w:ge50},
+ {id:"avi",s:"B",role:"orn",t:"Survey avifaunistiche",why:"Interferenza Rete Natura 2000",
+  d:"Indagini ornitologiche di campo a supporto di fauna e VIncA, a cura di ornitologo qualificato.",
+  l:[["Dir. 2009/147/CE (Uccelli)","Tutela avifauna e siti Natura 2000."]],w:c=>ge50(c)&&c.natura2000},
+ {id:"vinca",s:"B",role:"agr",t:"Valutazione di Incidenza (VIncA)",why:"Interferenza Rete Natura 2000",
+  d:"Obbligatoria per interferenza diretta o indiretta con siti Natura 2000 o elementi di primo livello della RER. Redatta da tecnico abilitato.",
+  l:[["DPR 357/97","Disciplina della VIncA (Direttiva Habitat)."],["Dir. 92/43/CEE / 2009/147/CE","Siti e specie tutelate."]],w:c=>ge50(c)&&c.natura2000},
+ {id:"idro",s:"B",role:"geo",t:"Idrogeologia, geotermia e scarichi",
+  d:"Studio idrogeologico, usi per raffreddamento e geotermia, concessioni di derivazione e autorizzazioni allo scarico.",
+  l:[["Art. 104 c.1 TUA","Divieto scarico in falda, salvo deroga geotermica."]],w:ge50},
+ {id:"aria",s:"B",role:"ing",t:"Emissioni in atmosfera e qualità dell'aria",
+  d:"Modellistica di dispersione dei GE (anche in manutenzione/emergenza), impatti su recettori e cumulativi.",
+  l:[["D.Lgs. 155/2010 art. 5","Programmi di valutazione qualità aria."],["Art. 5 c.1 lett. c) TUA","Aria e clima."]],w:ge50},
+ {id:"acu",s:"B",role:"ing",t:"Acustica previsionale",
+  d:"Valutazione nei tre scenari (esercizio, manutenzione, emergenza), con attenzione a componenti tonali in bassa frequenza e impulsive. Tecnico competente in acustica.",
+  l:[["Linee guida MASE 2024","Scenari e penalizzazioni acustiche."]],w:ge50},
+ {id:"scavo",s:"B",role:"geo",t:"Terre e rocce da scavo · Piano di Utilizzo",
+  d:"Caratterizzazione dei materiali, qualifica come sottoprodotti e redazione del Piano di Utilizzo; uso in sito escluso dalla disciplina rifiuti.",
+  l:[["DPR 120/2017 art. 4","Qualifica sottoprodotti."],["DPR 120/2017 artt. 5 e 9","Requisiti e Piano di Utilizzo."],["DPR 120/2017 art. 24","Esclusione rifiuti per uso in sito."]],w:ge50},
+ {id:"rif",s:"B",role:"ing",t:"Rifiuti da demolizione",
+  d:"Gestione, classificazione e destino dei rifiuti di cantiere e demolizione.",
+  l:[["Parte IV TUA","Gestione rifiuti."]],w:ge50},
+ {id:"san",s:"B",role:"ing",t:"Aspetti sanitari",
+  d:"Profili di salute della popolazione esposta (mortalità/ricovero, dati ISTAT) per gli scenari di progetto.",
+  l:[["Linee guida MASE 2024","Profili di salute; VIS per impianti > 300 MWt."]],
+  n:"Valutazione di Impatto Sanitario (VIS) obbligatoria solo oltre 300 MWt.",w:ge50},
+ {id:"rischi",s:"B",role:"ing",t:"Rischi esogeni e accidentali",
+  d:"Vulnerabilità del progetto a gravi incidenti e calamità e relativi effetti ambientali.",
+  l:[["Art. 5 c.1 lett. c) TUA","Vulnerabilità a incidenti/calamità."]],w:ge50},
+ {id:"visivo",s:"B",role:"agr",t:"Impatto visivo e paesaggio",
+  d:"Inserimento paesaggistico, fotosimulazioni e opere di mitigazione. Quando vi è vincolo paesaggistico la trattazione è cogente.",
+  l:[["Art. 5 c.1 lett. c) TUA","Paesaggio e patrimonio culturale."]],w:ge50},
+ {id:"render",s:"B",role:"ari",t:"Rendering e fotosimulazioni",why:"Vincolo paesaggistico",
+  d:"Elaborazioni grafiche a supporto dell'impatto visivo, in coordinamento con l'agronomo.",
+  l:[["Art. 5 c.1 lett. c) TUA","Paesaggio."]],w:c=>ge50(c)&&c.paesaggio},
+ {id:"arche",s:"B",role:"arc",t:"Relazione archeologica",why:"Interesse archeologico",
+  d:"Verifica preventiva dell'interesse archeologico (potenziale e da indagini), a cura di figura dedicata.",
+  l:[["Linee guida MASE 2024","Verifiche archeologiche."]],w:c=>ge50(c)&&c.archeo},
+ {id:"relrif",s:"B",role:"ing",t:"Relazione di riferimento",why:"Stoccaggio gasolio",
+  d:"Documenta lo stato di suolo e acque sotterranee a inizio attività in presenza di stoccaggi rilevanti di gasolio. In coordinamento con il geologo.",
+  l:[["Art. 29-ter lett. m) TUA","Relazione di riferimento per stoccaggi rilevanti."]],w:c=>ge50(c)&&c.gasolio},
+ {id:"climate",s:"B",role:"ing",t:"Climate proofing",
+  d:"Verifica climatica dell'infrastruttura (resilienza e mitigazione).",
+  l:[["Reg. (UE) 1060/2021","Verifica climatica delle infrastrutture."]],w:ge50},
+ {id:"cumul",s:"B",role:"proc",t:"Impatti cumulativi e sinergici",
+  d:"Valutazione degli impatti in cumulo con altre infrastrutture/attività presenti o in prossimità (traffico, industria, zootecnia).",
+  l:[["Art. 5 c.1 lett. c) TUA","Interazione tra i fattori."]],w:ge50},
+ {id:"coord",s:"B",role:"proc",t:"Coordinamento e validazione dello Studio",
+  d:"Assemblaggio multidisciplinare, valutazione unitaria e contestuale, validazione incrociata prima del deposito.",
+  l:[["Artt. 19 / 23 ss. TUA","Contenuti di SPA / SIA."]],w:ge50},
+
+ {id:"dep",s:"C",role:"proc",t:"Deposito dell'istanza (portale MASE)",
+  d:"Caricamento di studio, elaborati progettuali e quadro programmatico sul portale dell'autorità competente statale.",
+  l:[["Art. 19 / 23 ss. TUA","Avvio del procedimento."]],w:ge50},
+ {id:"verif",s:"C",role:"proc",t:"Istruttoria di verifica di assoggettabilità",why:"Banda 50–150 MWt",
+  d:"Il MASE valuta se il progetto possa essere escluso dalla VIA sulla base dello SPA.",
+  l:[["Art. 19 TUA","Verifica di assoggettabilità."]],w:c=>c.power==='50_150'},
+ {id:"esito",s:"C",role:"proc",t:"Esito: esclusione o assoggettamento",why:"Banda 50–150 MWt",
+  d:"Se escluso si procede verso l'AIA; se assoggettato si attiva la VIA piena. Il decreto fissa la fase di adempimento delle condizioni.",
+  l:[["Art. 19 TUA","Provvedimento conclusivo della verifica."]],w:c=>c.power==='50_150'},
+ {id:"via",s:"C",role:"proc",t:"Procedura di VIA piena",why:"Banda > 150 MWt",
+  d:"VIA che individua, descrive e valuta gli impatti del progetto. Il provvedimento è sempre integrato nel titolo abilitativo e nell'AIA.",
+  l:[["Artt. 23 ss. TUA","Procedimento di VIA."],["Art. 26 c.1 TUA","Integrazione della VIA; titoli senza VIA annullabili."],["Art. 29 c.1 TUA","Annullabilità per violazione di legge."]],
+  n:"Si attiva anche se, nella banda 50–150 MWt, la verifica si conclude con assoggettamento a VIA.",w:c=>c.power==='gt150'},
+ {id:"ottemp",s:"C",role:"proc",t:"Verifica di ottemperanza ante-esecutivo",why:"Prescrizioni ante-esecutivo",
+  d:"Se il decreto impone prescrizioni da sviluppare prima della progettazione esecutiva, l'AIA deve essere preceduta dalla verifica di ottemperanza.",
+  l:[["Art. 28 TUA","Verifica di ottemperanza delle condizioni ambientali."]],w:c=>ge50(c)&&c.prescrizioni},
+
+ {id:"aia",s:"D",role:"proc",t:"Autorizzazione Integrata Ambientale (AIA)",
+  d:"Obbligatoria per impianto termico > 50 MWt. Acquisita dopo esclusione da VIA o VIA favorevole; integra il Piano di Monitoraggio e Controllo (PMC).",
+  l:[["Art. 29-ter TUA","Domanda di AIA."],["Art. 26 c.1 TUA","Priorità della VIA sul rilascio dell'AIA."]],w:ge50},
+ {id:"titolo",s:"D",role:"proc",t:"Titolo edilizio (Comune)",
+  d:"Rilasciato dopo le valutazioni ambientali. Titoli rilasciati prima espongono ad annullamento e maggiori costi di adeguamento.",
+  l:[["Art. 26 c.1 TUA","VIA integrata in ogni titolo abilitativo."]],w:()=>true},
+ {id:"conf",s:"D",role:"proc",t:"Conferenza di Servizi",
+  d:"Per strutture di medie/grandi dimensioni, con parere di compatibilità di Provincia o Città Metropolitana.",
+  l:[["DGR Lombardia 2629/2024","Parere in Conferenza di Servizi."]],w:ge50},
+ {id:"pereq",s:"D",role:"proc",t:"Perequazione territoriale intercomunale",
+  d:"Per i grandi data center si auspica l'applicazione di forme di perequazione tra Comuni interessati.",
+  l:[["L.R. 12/2005 art. 11 c.2-ter","Perequazione intercomunale."]],w:ge50},
+ {id:"pma",s:"D",role:"proc",t:"Piano di Monitoraggio Ambientale (PMA)",
+  d:"Ante operam, corso d'opera e post operam per tutte le componenti; integrato e coordinato con il PMC dell'AIA. Multi-ruolo per componente.",
+  l:[["Art. 28 TUA","Ottemperanza e impatti non previsti."],["D.Lgs. 155/2010 art. 5","Campagne di monitoraggio qualità aria."]],w:ge50},
+ {id:"decom",s:"D",role:"agr",t:"Decommissioning e restauro ecologico",
+  d:"Piano di dismissione (dettagliato 2–3 anni prima), ripristino ecosistemico secondo criteri di Restoration Ecology, cronoprogramma e analisi costi-benefici.",
+  l:[["Linee guida MASE 2024","Piano di decommissioning (standard SER)."]],w:ge50}
+];
+
+let cfg={power:'50_150',natura2000:false,gasolio:false,contaminato:false,paesaggio:true,archeo:true,prescrizioni:false};
+let done={};
+try{const sd=localStorage.getItem('dc_done');if(sd)done=JSON.parse(sd);const sc=localStorage.getItem('dc_cfg');if(sc)cfg=Object.assign(cfg,JSON.parse(sc));}catch(e){}
+function save(){try{localStorage.setItem('dc_done',JSON.stringify(done));localStorage.setItem('dc_cfg',JSON.stringify(cfg));}catch(e){}}
+
+const CHK='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg>';
+const stagesEl=document.getElementById('stages');
+
+function applicable(){return STEPS.filter(s=>s.w(cfg));}
+
+function render(){
+  // sync config buttons
+  document.querySelectorAll('.seg').forEach(seg=>{
+    const k=seg.dataset.k;
+    seg.querySelectorAll('button').forEach(b=>{
+      const v=b.dataset.v;const cur=(k==='power')?cfg.power:(cfg[k]?'1':'0');
+      b.classList.toggle('on',v===cur);
+    });
+  });
+  // path summary
+  const p=document.getElementById('path');let html='';
+  if(cfg.power==='lt50'){html='<span class="step">VAS / urbanistica</span><span class="sep">→</span><span class="step">Titolo edilizio</span>';}
+  else{
+    html+='<span class="step">'+(cfg.power==='gt150'?'> 150 MWt':'50–150 MWt')+'</span><span class="sep">→</span>';
+    html+=(cfg.power==='gt150')?'<span class="step">VIA (art. 23)</span>':'<span class="step">Verifica (art. 19)</span>';
+    html+='<span class="sep">→</span><span class="step">AIA</span><span class="sep">→</span><span class="step">Titolo</span>';
+    if(cfg.natura2000)html+='<span class="cond">+ VIncA</span>';
+    if(cfg.gasolio)html+='<span class="cond">+ Rel. riferimento</span>';
+    if(cfg.contaminato)html+='<span class="cond">+ CSC</span>';
+    if(cfg.archeo)html+='<span class="cond">+ Archeologia</span>';
+    if(cfg.prescrizioni)html+='<span class="cond">+ Ottemperanza</span>';
+  }
+  p.innerHTML=html;
+
+  // stages
+  const list=applicable();
+  stagesEl.innerHTML='';
+  Object.keys(STAGES).forEach(sk=>{
+    const items=list.filter(s=>s.s===sk);if(!items.length)return;
+    const dn=items.filter(s=>done[s.id]).length;
+    const wrap=document.createElement('div');wrap.className='stage';
+    wrap.innerHTML=`<div class="stage-h"><span class="sn">${sk}</span><span class="st">${STAGES[sk]}</span><span class="ct">${dn}/${items.length}</span></div>`;
+    const tl=document.createElement('div');tl.className='tl';
+    items.forEach(s=>{
+      const r=ROLE[s.role];const title=typeof s.t==='function'?s.t(cfg):s.t;const isDone=!!done[s.id];
+      const it=document.createElement('div');it.className='item'+(isDone?' done':'');it.style.setProperty('--c',r[1]);
+      it.innerHTML=`<div class="row">
+        <div class="chk" data-chk="${s.id}" role="checkbox" aria-checked="${isDone}" tabindex="0">${CHK}</div>
+        <div class="main">
+          <div class="top"><span class="ttl">${title}</span><span class="role">${r[0]}</span>${s.why?`<span class="why">${s.why}</span>`:''}</div>
+          <div class="det"><div class="det-in">
+            <p>${s.d}</p>
+            <div class="laws">${s.l.map(x=>`<div class="law"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+            ${s.n?`<div class="note">${s.n}</div>`:''}
+          </div></div>
+        </div>
+        <svg class="caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>`;
+      tl.appendChild(it);
+    });
+    wrap.appendChild(tl);stagesEl.appendChild(wrap);
+  });
+
+  // progress
+  const total=list.length,dtot=list.filter(s=>done[s.id]).length;
+  const pc=total?Math.round(dtot/total*100):0;
+  document.getElementById('barfill').style.width=pc+'%';
+  document.getElementById('pct').textContent=`${dtot} / ${total} step · ${pc}%`;
+}
+
+// config clicks
+document.querySelectorAll('.seg').forEach(seg=>{
+  seg.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;const k=seg.dataset.k,v=b.dataset.v;
+    if(k==='power')cfg.power=v;else cfg[k]=(v==='1');
+    save();render();
+  });
+});
+
+// toggle done + expand
+stagesEl.addEventListener('click',e=>{
+  const chk=e.target.closest('[data-chk]');
+  if(chk){const id=chk.dataset.chk;done[id]=!done[id];save();render();e.stopPropagation();return;}
+  const item=e.target.closest('.item');if(item)item.classList.toggle('open');
+});
+stagesEl.addEventListener('keydown',e=>{
+  const chk=e.target.closest('[data-chk]');
+  if(chk&&(e.key===' '||e.key==='Enter')){e.preventDefault();const id=chk.dataset.chk;done[id]=!done[id];save();render();}
+});
+
+document.getElementById('reset').addEventListener('click',()=>{done={};save();render();});
+
+render();
+</script>
+</body>
+</html>
